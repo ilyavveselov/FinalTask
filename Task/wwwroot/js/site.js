@@ -192,6 +192,8 @@ function setRedirectToModalOnAllPizzas() {
 function handleFormModal(mode, pizzaId = null) {
     const isEdit = mode === 'edit';
     const url = isEdit ? '/Home/Edit' : '/Home/Create';
+    const apiUrl = isEdit ? `/api/pizza/${pizzaId}` : '/api/pizza';
+    const httpMethod = isEdit ? 'PUT' : 'POST';
     const requestData = isEdit ? { id: pizzaId } : {};
 
     $.ajax({
@@ -201,26 +203,49 @@ function handleFormModal(mode, pizzaId = null) {
         success: function (html) {
             $('#pizzaModal .modal-dialog').html(html);
             $('#pizzaModal').modal('show');
-
             $('#pizzaModal').find('input[name="returnUrl"]').val(window.location.href);
 
-            $('#pizzaModal').on('submit', 'form', function (e) {
+            $('#pizzaModal').off('submit').on('submit', 'form', function (e) {
                 e.preventDefault();
+                const $form = $(this);
+
+                const data = {
+                    Id: Number($form.find('[name="Id"]').val()) || 0,
+                    Name: $form.find('[name="Name"]').val(),
+                    Description: $form.find('[name="Description"]').val(),
+                    Image: $form.find('[name="Image"]').val(),
+                    Price: Number($form.find('[name="Price"]').val()) || 0,
+                    Weight: Number($form.find('[name="Weight"]').val()) || 0,
+                    CanHalf: $form.find('[name="CanHalf"]').is(':checked'),
+                    ShowHalf: $form.find('[name="ShowHalf"]').is(':checked'),
+                    IsHit: $form.find('[name="IsHit"]').is(':checked'),
+                    Sizes: $form.find('[name="Sizes"]:checked').map(function () {
+                        return parseInt(this.value);
+                    }).get(),
+                    Types: $form.find('[name="Types"]:checked').map(function () {
+                        return this.value;
+                    }).get()
+                };
 
                 $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function (response) {
-                        if (response.redirect) {
-                            window.location.href = response.redirect;
-                        } else {
-                            $('#pizzaModal .modal-dialog').html(response);
-                            $('#pizzaModal').find('input[name="returnUrl"]').val(window.location.href);
-                        }
+                    url: apiUrl,
+                    type: httpMethod,
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function () {
+                        $('#pizzaModal').modal('hide');
+                        location.reload();
                     },
-                    error: function () {
-                        $('#pizzaModal .modal-dialog').html('<div class="alert alert-danger">Ошибка отправки формы</div>');
+                    error: function (xhr) {
+                        if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            $form.find('.text-danger').text('');
+                            const errors = xhr.responseJSON.errors;
+                            for (const key in errors) {
+                                $form.find(`[data-valmsg-for="${key}"]`).text(errors[key]);
+                            }
+                        } else {
+                            $('#pizzaModal .modal-dialog').html('<div class="alert alert-danger">Ошибка отправки формы</div>');
+                        }
                     }
                 });
             });
@@ -235,6 +260,7 @@ function handleFormModal(mode, pizzaId = null) {
         $(this).find('.modal-dialog').empty();
     });
 }
+
 function openEditPizzaModal(pizzaId) {
     handleFormModal('edit', pizzaId);
 }
@@ -242,6 +268,7 @@ function openEditPizzaModal(pizzaId) {
 function openCreatePizzaModal() {
     handleFormModal('create');
 }
+
 
 function setConfrimOnDelete() {
     $(document).on('click', '.delete-btn', function (e) {
