@@ -17,14 +17,7 @@
         }
         <img class="pizza-card-img" src="@Model.Image" alt="@Model.Name" />
         <span class="pizza-card-name">
-            @if (isHeaderLink)
-            {
-                <a href="@Url.Action("Details", "Home", new { id = Model.Id })">@Model.Name</a>
-            }
-            else
-            {
-                @Model.Name
-            }
+            @Model.Name
         </span>
         <div class="pizza-card-buttons">
             <span class="pizza-card-edit" onclick="openEditPizzaModal(@Model.Id)"><i class="bi bi-pencil"></i></span>
