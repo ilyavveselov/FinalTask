@@ -1,0 +1,16 @@
+﻿@using Task.Models
+@model List<PizzaModel>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="pizza-container">
+    @foreach(var pizza in Model)
+    {
+        @await Html.PartialAsync("PizzaPartials/_Card", pizza);
+    }
+</div>
+<script src="~/js/site.js"></script>
+<script>
+    setRedirectToModalOnAllPizzas()
+</script>
