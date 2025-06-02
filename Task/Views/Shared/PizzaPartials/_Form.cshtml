@@ -36,7 +36,7 @@
 
             <div class="form-group">
                 <label asp-for="Price"></label>
-                <input asp-for="Price" class="form-control input-num" />
+                <input asp-for="Price" class="form-control input-num" min="100" value="@(Model.Price == 0 ? 100 : Model.Price)" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
 
