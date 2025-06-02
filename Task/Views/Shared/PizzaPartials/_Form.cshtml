@@ -36,13 +36,13 @@
 
             <div class="form-group">
                 <label asp-for="Price"></label>
-                <input asp-for="Price" class="form-control" />
+                <input asp-for="Price" class="form-control input-num" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Weight"></label>
-                <input asp-for="Weight" class="form-control" />
+                <input asp-for="Weight" class="form-control input-num" />
             </div>
             <div class="selectors">
                 <div class="form-group selectors-checkers">
@@ -104,3 +104,8 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+<script>
+    $(document).on('input', '.input-num', function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+</script>
