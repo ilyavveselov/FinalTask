@@ -1,7 +1,7 @@
 ﻿@model PizzaModel
 @inject IPizzaRepository pizzaRepository
-@using Task4.RazorHelpers
-@using Task4.Repositories
+@using Task.RazorHelpers
+@using Task.Repositories
 @{
     var availableSizes = await PizzaHelper.GetAvailableSizes(pizzaRepository);
     var availableTypes = await PizzaHelper.GetAvailableTypes(pizzaRepository);

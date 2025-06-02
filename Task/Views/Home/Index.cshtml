@@ -1,8 +1,12 @@
-﻿@{
+﻿@using Task.Models
+@model List<PizzaModel>
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div id="pizza-container">
+    @foreach(var pizza in Model)
+    {
+        @await Html.PartialAsync("PizzaPartials/_Card", pizza);
+    }
 </div>
