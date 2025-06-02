@@ -45,62 +45,6 @@ async function getActiveSelectors(pizza) {
     }
     return { sizes: sizesHTML, types: typesHTML }
 }
-async function renderPizzaCard(pizza) {
-    const selectorsHTML = await getActiveSelectors(pizza);
-    const hitHTML = pizza.isHit
-        ? '<span class="pizza-card-hit">HIT</span>'
-        : '';
-    let halfOptionHTML = '';
-    if (pizza.showHalf) {
-        pizza.canHalf
-            ? halfOptionHTML += '<span class="pizza-card-half-selector active">1/2</span>'
-            : halfOptionHTML += '<span class="pizza-card-half-selector disable">1/2</span>'
-    }
-    const card = `
-            <div class="pizza-card" data-id=${pizza.id}>
-                <div class="pizza-card-header">
-                    ${hitHTML}
-                    <img class="pizza-card-img"
-                         src="${pizza.image}" alt=${pizza.name}/>
-                    <span class="pizza-card-name">
-                            ${pizza.name}
-                    </span>
-                    <div class="pizza-card-buttons">
-                        <span class="pizza-card-edit" onclick="openEditPizzaModal(${pizza.id})">
-                            <i class="bi bi-pencil"></i>
-                        </span>
-                        <span class="pizza-card-delete">
-                            <form action="/Home/Delete" method="post" class="delete-form">
-                                <input type="hidden" name="Id" value="${pizza.id}" />
-                                <input type="hidden" name="returnUrl" value="${window.location.pathname}" />
-                                <button type="submit" class="btn btn-danger delete-btn">
-                                    <i class="bi bi-x-circle"></i>
-                                </button>
-                            </form>
-                        </span>
-                    </div>
-                </div>
-                <div class="pizza-card-description">
-                    ${pizza.description}
-                </div>
-                <div class="pizza-card-selectors">
-                    <div class="size-selector">
-                        ${selectorsHTML.sizes}
-                    </div>
-                    <div class="type-selector">
-                        ${selectorsHTML.types}
-                    </div>
-                </div>
-                <div class="pizza-card-info">
-                    <span class="pizza-card-price">${pizza.price} Р</span>
-                    <span class="pizza-card-weight">${pizza.weight} гр</span>
-                    <span class="pizza-card-half">${halfOptionHTML}</span>
-                </div>
-                <button class="in-cart-button">В корзину</button>
-            </div>
-        `;
-    return card;
-}
 async function renderModalPizzaCard(pizza) {
     pizza = JSON.parse(pizza);
     const selectorsHTML = await getActiveSelectors(pizza);
@@ -269,17 +213,22 @@ function openCreatePizzaModal() {
     handleFormModal('create');
 }
 
-
-function setConfrimOnDelete() {
+function setDeletePizzaListener() {
     $(document).on('click', '.delete-btn', function (e) {
-        e.preventDefault();
         e.stopImmediatePropagation();
-        var pizzaName = $(this).closest('.pizza-card').find('.pizza-card-name').text();
-        var form = $(this).closest('.delete-form');
+        const id = $(this).closest('form').data('id');
 
-        if (confirm(`Точно удалить "${pizzaName.trim()}"?`)) {
-            form.submit();
-        }
-        return false;
+        if (!confirm('Вы уверены, что хотите удалить эту пиццу?')) return;
+
+        $.ajax({
+            url: `/api/pizza/${id}`,
+            type: 'DELETE',
+            success: function () {
+                location.reload();
+            },
+            error: function () {
+                alert('Ошибка при удалении пиццы');
+            }
+        });
     });
 }

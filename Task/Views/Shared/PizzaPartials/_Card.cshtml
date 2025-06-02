@@ -22,9 +22,7 @@
         <div class="pizza-card-buttons">
             <span class="pizza-card-edit" onclick="openEditPizzaModal(@Model.Id)"><i class="bi bi-pencil"></i></span>
             <span class="pizza-card-delete">
-                <form asp-action="Delete" method="post" class="delete-form">
-                    <input type="hidden" name="Id" value="@Model.Id" />
-                    <input type="hidden" name="returnUrl" id="returnUrl" value="@Context.Request.Path" />
+                <form class="delete-form" data-id="@Model.Id">
                     <button type="button" class="btn btn-danger delete-btn"><i class="bi bi-x-circle"></i></button>
                 </form>
             </span>
@@ -63,15 +61,5 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/js/site.js"></script>
 <script>
-    $(document).on('click', '.delete-btn', function(e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        var pizzaName = $(this).closest('.pizza-card').find('.pizza-card-name').text();
-        var form = $(this).closest('.delete-form');
-
-        if (confirm(`Точно удалить "${pizzaName.trim()}"?`)) {
-            form.submit();
-        }
-        return false;
-    });
+    setDeletePizzaListener();
 </script>
