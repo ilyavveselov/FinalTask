@@ -1,0 +1,105 @@
+﻿@model Task4.Models.PizzaModel
+@using Task4.RazorHelpers
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">@Model.Name</h5>
+    </div>
+    <div class="pizza-form">
+        <form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post">
+            @if (Model.Id != 0)
+            {
+                <input asp-for="Id" hidden value="@Model.Id" />
+            }
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Image"></label>
+                <select asp-for="Image" class="form-control">
+                    <option value="">Выберите изображение... (не выбирайте, если нет подходящей картинки)</option>
+                    @foreach (var image in Html.GetAvailableImages())
+                    {
+                        <option value="@image">@image</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Price"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Weight"></label>
+                <input asp-for="Weight" class="form-control" />
+            </div>
+            <div class="selectors">
+                <div class="form-group selectors-checkers">
+                    <label>Размеры:</label>
+                    @foreach (var size in ViewBag.AllSizes as List<Size>)
+                    {
+                        var isChecked = Model.Sizes.Contains(size.Value);
+
+                        <span class="form-check">
+                            <input type="checkbox"
+                                   name="Sizes"
+                                   value="@size.Value"
+                                   class="form-check-input"
+                                   @(isChecked ? "checked" : "") />
+
+                            <label class="form-check-label">@size.Value см</label>
+                        </span>
+                    }
+                </div>
+                <span asp-validation-for="Sizes" class="text-danger"></span>
+            </div>
+            <div class="selectors">
+                <div class="form-group selectors-checkers">
+                    <label>Типы теста:</label>
+                    @foreach (var type in ViewBag.AllDoughTypes as List<DoughType>)
+                    {
+                        var isChecked = Model.Types.Contains(type.Name);
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   name="Types"
+                                   value="@type.Name"
+                                   class="form-check-input"
+                                   @(isChecked ? "checked" : "") />
+
+                            <label class="form-check-label">@type.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="form-checkers">
+                <span class="form-group form-check">
+                    <input asp-for="CanHalf" class="form-check-input" />
+                    <label asp-for="CanHalf" class="form-check-label"></label>
+                </span>
+                <span class="form-group form-check">
+                    <input asp-for="ShowHalf" class="form-check-input" />
+                    <label asp-for="ShowHalf" class="form-check-label"></label>
+                </span>
+                <span class="form-group form-check">
+                    <input asp-for="IsHit" class="form-check-input" />
+                    <label asp-for="IsHit" class="form-check-label"></label>
+                </span>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <input type="hidden" name="returnUrl" id="returnUrl" value="" />
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

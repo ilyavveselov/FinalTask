@@ -1,0 +1,84 @@
+﻿@model PizzaModel
+@inject IPizzaRepository pizzaRepository
+@using Task4.RazorHelpers
+@using Task4.Repositories
+@{
+    var availableSizes = await PizzaHelper.GetAvailableSizes(pizzaRepository);
+    var availableTypes = await PizzaHelper.GetAvailableTypes(pizzaRepository);
+    var (activeSize, activeType) = Html.GetActiveSelectors(Model, availableSizes, availableTypes);
+    var isHeaderLink = ViewData["IsHeaderLink"] as bool? ?? false;
+}
+
+<div class="pizza-card" data-id=@Model.Id>
+    <div class="pizza-card-header">
+        @if (Model.IsHit)
+        {
+            <span class="pizza-card-hit">HIT</span>
+        }
+        <img class="pizza-card-img" src="@Model.Image" alt="@Model.Name" />
+        <span class="pizza-card-name">
+            @if (isHeaderLink)
+            {
+                <a href="@Url.Action("Details", "Home", new { id = Model.Id })">@Model.Name</a>
+            }
+            else
+            {
+                @Model.Name
+            }
+        </span>
+        <div class="pizza-card-buttons">
+            <span class="pizza-card-edit" onclick="openEditPizzaModal(@Model.Id)"><i class="bi bi-pencil"></i></span>
+            <span class="pizza-card-delete">
+                <form asp-action="Delete" method="post" class="delete-form">
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <input type="hidden" name="returnUrl" id="returnUrl" value="@Context.Request.Path" />
+                    <button type="button" class="btn btn-danger delete-btn"><i class="bi bi-x-circle"></i></button>
+                </form>
+            </span>
+        </div>
+    </div>
+
+    <div class="pizza-card-description">
+        @Model.Description
+    </div>
+
+    <div class="pizza-card-selectors">
+        <div class="size-selector">
+            @Html.RenderSelectors(availableSizes, Model.Sizes, activeSize, true)
+        </div>
+        <div class="type-selector">
+            @if (Model.Types?.Any() == true)
+            {
+                @Html.RenderSelectors(availableTypes, Model.Types, activeType, false)
+            }
+        </div>
+    </div>
+
+    <div class="pizza-card-info">
+        <span class="pizza-card-price">@Model.Price Р</span>
+        <span class="pizza-card-weight">@Model.Weight гр</span>
+        <span class="pizza-card-half">
+            @if (Model.ShowHalf)
+            {
+                var halfClass = Model.CanHalf ? "active" : "disable";
+                <span class="pizza-card-half-selector @halfClass">1/2</span>
+            }
+        </span>
+    </div>
+    <button class="in-cart-button">В корзину</button>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/site.js"></script>
+<script>
+    $(document).on('click', '.delete-btn', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        var pizzaName = $(this).closest('.pizza-card').find('.pizza-card-name').text();
+        var form = $(this).closest('.delete-form');
+
+        if (confirm(`Точно удалить "${pizzaName.trim()}"?`)) {
+            form.submit();
+        }
+        return false;
+    });
+</script>
