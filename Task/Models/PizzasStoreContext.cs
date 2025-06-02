@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Task4.Models;
+namespace Task.Models;
 
 public partial class PizzasStoreContext : DbContext
 {

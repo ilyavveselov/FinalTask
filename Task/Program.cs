@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using Task4.Models;
+using Task.Models;
+using Task.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<PizzasStoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddScoped<IPizzaRepository, PizzaRepository>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

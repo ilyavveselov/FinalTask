@@ -1,21 +1,25 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Task.Models;
+using Task.Repositories;
 
 namespace Task.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IPizzaRepository _pizzaRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IPizzaRepository pizzaRepository)
         {
             _logger = logger;
+            _pizzaRepository = pizzaRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var pizzas = await _pizzaRepository.GetAllPizzas();
+            return View(pizzas);
         }
 
         public IActionResult Privacy()

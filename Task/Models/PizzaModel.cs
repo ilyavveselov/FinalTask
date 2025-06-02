@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Task4.Models
+namespace Task.Models
 {
     public class PizzaModel
     {
